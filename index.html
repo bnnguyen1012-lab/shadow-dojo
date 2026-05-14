@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Shadow Dojo</title>
+
+  <!-- loads two fonts from Google -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+
+  <!-- links our external CSS file -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="screen">
+    <div class="dojo-bg"></div>
+    <div class="start-content">
+      <h1 class="game-title">SHADOW DOJO</h1>
+      <p class="subtitle">3rd Person Martial Arts</p>
+      <div class="controls-box">
+        <div class="side">
+          <h3>MOVEMENT</h3>
+          <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> &mdash; Move</p>
+          <p><kbd>Space</kbd> &mdash; Jump</p>
+          <p><kbd>F</kbd> &mdash; Block (hold)</p>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="side">
+          <h3>ATTACKS</h3>
+          <p><kbd>LMB</kbd> &mdash; Quick Punch</p>
+          <p><kbd>RMB</kbd> &mdash; Hard Punch</p>
+          <p><kbd>K</kbd> &mdash; Kick</p>
+          <p><kbd>M</kbd> &mdash; Choke Grab</p>
+        </div>
+      </div>
+      <button id="start-btn" class="big-btn">START FIGHT</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game-screen" class="screen hidden">
+    <div id="hud">
+      <div class="f-hud" id="hud-player">
+        <span class="f-name">PLAYER</span>
+        <div style="flex:1;min-width:0">
+          <div class="hp-outer"><div class="hp-inner" id="p-hp-bar"></div></div>
+          <div class="st-outer"><div class="st-inner" id="p-st-bar"></div></div>
+        </div>
+        <span class="hp-num" id="p-hp-num">100</span>
+      </div>
+      <div class="hud-mid">
+        <div id="round-txt">ROUND 1</div>
+        <div id="timer-txt">60</div>
+      </div>
+      <div class="f-hud" id="hud-cpu">
+        <span class="hp-num" id="c-hp-num">100</span>
+        <div style="flex:1;min-width:0">
+          <div class="hp-outer"><div class="hp-inner" id="cpu-hp-bar"></div></div>
+          <div class="st-outer"><div class="st-inner" id="cpu-st-bar"></div></div>
+        </div>
+        <span class="f-name">CPU</span>
+      </div>
+    </div>
+
+    <!-- lobby button fixed top-right during gameplay -->
+    <button id="lobby-btn">&#8592; LOBBY</button>
+
+    <canvas id="game-canvas"></canvas>
+    <div id="move-label"></div>
+    <div id="round-msg" style="display:none"></div>
+  </div>
+
+  <!-- GAMEOVER SCREEN -->
+  <div id="gameover-screen" class="screen hidden">
+    <div class="dojo-bg"></div>
+    <div class="start-content">
+      <h1 id="go-title" class="game-title"></h1>
+      <p  id="go-sub"   class="subtitle"></p>
+      <div style="display:flex; gap:14px;">
+        <button id="restart-btn" class="big-btn">PLAY AGAIN</button>
+        <button id="go-lobby-btn" class="big-btn go-lobby-style">LOBBY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- links our external JS file — placed at the bottom so HTML loads first -->
+  <script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,440 @@
+/* ================================================================
+   styles.css — Shadow Dojo
+   This file controls how everything LOOKS.
+   CSS = Cascading Style Sheets
+   Every rule here targets an HTML element and changes its appearance.
+================================================================ */
+
+
+/* ── RESET ──────────────────────────────────────────────────────
+   Browsers add default spacing to elements we don't want.
+   The * means "apply this to EVERY element on the page".
+   *::before and *::after target invisible elements browsers
+   sometimes insert before/after real elements. */
+*, *::before, *::after {
+  margin: 0;               /* removes default gap OUTSIDE elements */
+  padding: 0;              /* removes default gap INSIDE elements */
+  box-sizing: border-box;  /* padding is included in the width, not added on top */
+}
+
+/* html and body are the two root containers that hold everything */
+html, body {
+  width: 100%;              /* stretch to fill the full window width */
+  height: 100%;             /* stretch to fill the full window height */
+  background: #0a0a0f;      /* very dark blue-black background color */
+  font-family: 'Share Tech Mono', monospace; /* use the techy font we loaded */
+  color: #e8e8f0;           /* light grey-white color for all text */
+  overflow: hidden;         /* hides scrollbars — the game fills the whole screen */
+  user-select: none;        /* stops the user accidentally highlighting text */
+}
+
+
+/* ── SCREEN SYSTEM ──────────────────────────────────────────────
+   We have 3 full-screen layers: start, game, and gameover.
+   Only one shows at a time — JavaScript adds/removes .hidden
+   to swap between them. */
+.screen {
+  position: fixed;           /* stays pinned to the window, doesn't scroll */
+  inset: 0;                  /* shorthand for top:0 right:0 bottom:0 left:0 */
+  display: flex;             /* flex lets us easily center children inside */
+  flex-direction: column;    /* stack children top to bottom */
+  align-items: center;       /* center children left-to-right */
+  justify-content: center;   /* center children top-to-bottom */
+}
+
+/* .hidden is added by JavaScript to make a screen disappear */
+.hidden {
+  display: none; /* completely removes the element — it takes up no space */
+}
+
+
+/* ── ANIMATED DOJO BACKGROUND ───────────────────────────────────
+   The .dojo-bg div creates the moody dark arena atmosphere.
+   We use two overlapping gradient layers for depth. */
+.dojo-bg {
+  position: absolute;  /* sits inside its parent, doesn't push other things around */
+  inset: 0;            /* fills the entire parent element */
+  z-index: 0;          /* z-index = stacking order, 0 means behind other content */
+  /* two gradients layered together using commas */
+  background:
+    radial-gradient(ellipse at 50% 80%, #3a1a0a55 0%, transparent 60%),
+    /* radial-gradient = circular gradient, ellipse shape, centered at 50% 80% */
+    linear-gradient(180deg, #0a0a0f, #0f0f1a 50%, #0a0808);
+    /* linear-gradient = straight gradient, 180deg = top to bottom */
+}
+
+/* ::after creates an invisible extra layer ON TOP of .dojo-bg */
+/* we use it to add scrolling scanlines (retro TV effect) */
+.dojo-bg::after {
+  content: '';         /* ::after needs this to exist, even if empty */
+  position: absolute;  /* fills the same space as .dojo-bg */
+  inset: 0;
+  /* repeating-linear-gradient makes evenly-spaced thin horizontal stripes */
+  background: repeating-linear-gradient(
+    0deg,
+    transparent, transparent 3px,
+    rgba(255,255,255,0.013) 3px,
+    rgba(255,255,255,0.013) 4px
+  );
+  animation: scan 8s linear infinite; /* run the scan animation forever */
+}
+
+/* this @keyframes block defines the scan animation */
+/* it slowly moves the stripe pattern upward creating moving scanlines */
+@keyframes scan {
+  to { background-position: 0 -400px; } /* end state: moved 400px upward */
+}
+
+
+/* ── START SCREEN CONTENT ───────────────────────────────────────*/
+.start-content {
+  position: relative;      /* stays in normal flow but can be nudged */
+  z-index: 1;              /* sits above .dojo-bg which is z-index 0 */
+  display: flex;
+  flex-direction: column;  /* stack title, controls, button vertically */
+  align-items: center;     /* center everything horizontally */
+  gap: 22px;               /* 22px of space between each child element */
+  padding: 40px;           /* 40px breathing room on all sides */
+  text-align: center;      /* center all text inside */
+}
+
+/* the big SHADOW DOJO title */
+.game-title {
+  font-family: 'Bebas Neue', sans-serif; /* chunky display font */
+  /* clamp(min, preferred, max) scales with screen width */
+  font-size: clamp(60px, 10vw, 115px);
+  color: #f4a261;           /* warm orange */
+  letter-spacing: 8px;      /* spread letters apart */
+  line-height: 1;           /* no extra vertical space */
+  /* text-shadow adds glow layers behind the text */
+  /* format: offset-x offset-y blur color */
+  text-shadow: 0 0 20px #f4a261, 0 0 60px #c87941, 0 4px 0 #5a3a00;
+  animation: glow 3s ease-in-out infinite; /* breathing glow forever */
+}
+
+/* the glow animation alternates between a small and large glow */
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 20px #f4a261, 0 0 60px #c87941, 0 4px 0 #5a3a00; }
+  /* at start and end: small glow */
+  50%       { text-shadow: 0 0 45px #f4a261, 0 0 110px #f0a020, 0 4px 0 #5a3a00; }
+  /* at halfway: big glow */
+}
+
+/* small subtitle text under the title */
+.subtitle {
+  font-size: 12px;
+  color: #666;               /* medium grey */
+  letter-spacing: 5px;       /* spread letters out */
+  text-transform: uppercase; /* force all letters to capitals */
+}
+
+/* the controls reference box with keyboard shortcuts */
+.controls-box {
+  display: grid;                         /* grid lets us make columns */
+  grid-template-columns: 1fr auto 1fr;  /* left equal | middle shrink-fit | right equal */
+  gap: 28px;                            /* space between columns */
+  align-items: center;
+  background: rgba(255,255,255,0.04);   /* rgba = red green blue alpha(opacity) */
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;                  /* rounded corners */
+  padding: 22px 36px;                   /* 22px top/bottom, 36px left/right */
+  backdrop-filter: blur(8px);           /* blurs whatever is behind this box */
+}
+
+/* heading inside the controls box like "MOVEMENT" */
+.side h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: #f4a261;
+  letter-spacing: 2px;
+  margin-bottom: 10px; /* gap below the heading */
+}
+
+/* text lines inside the controls box */
+.side p {
+  font-size: 12px;
+  color: #999;        /* light grey */
+  line-height: 2.2;   /* extra space between lines for readability */
+}
+
+/* keyboard key badges like [W] [A] [Space] */
+kbd {
+  display: inline-block;                    /* lets us add padding to it */
+  background: rgba(255,255,255,0.13);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  color: #f4a261;
+}
+
+/* the big VS text in the middle of the controls box */
+.vs-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  color: #e63946;              /* red */
+  text-shadow: 0 0 20px #e63946;
+  animation: pulse 1s ease-in-out infinite; /* bouncing pulse */
+}
+
+/* makes the VS badge grow and shrink */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }     /* normal size */
+  50%       { transform: scale(1.15); } /* 15% bigger at the halfway point */
+}
+
+/* the big orange buttons used across all screens */
+.big-btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: #0a0a0f;               /* dark text on the orange button */
+  background: linear-gradient(135deg, #f4a261, #c87941); /* diagonal gradient */
+  border: none;                 /* remove the default browser button border */
+  border-radius: 8px;
+  padding: 15px 48px;           /* tall and wide */
+  cursor: pointer;              /* show a hand cursor so user knows it's clickable */
+  box-shadow: 0 4px 20px rgba(244,162,97,0.45); /* orange outer glow */
+  transition: transform .1s, box-shadow .1s;     /* smooth hover animation */
+}
+
+/* when hovering over the button, it floats up */
+.big-btn:hover {
+  transform: translateY(-3px);                    /* move up 3px */
+  box-shadow: 0 8px 30px rgba(244,162,97,.65);   /* stronger glow */
+}
+
+/* when clicking the button, it pushes down */
+.big-btn:active {
+  transform: translateY(1px);                    /* move down 1px */
+  box-shadow: 0 2px 10px rgba(244,162,97,.3);   /* weaker glow */
+}
+
+/* grey style for the secondary LOBBY button on the gameover screen */
+.go-lobby-style {
+  background: linear-gradient(135deg, #3a3a3a, #222); /* dark grey */
+  color: #aaa;       /* light grey text */
+  box-shadow: none;  /* no glow on this one */
+}
+
+
+/* ── GAME SCREEN ────────────────────────────────────────────────
+   Override the default centered layout so HUD and canvas
+   stack vertically from the top instead of being centered. */
+#game-screen {
+  flex-direction: column;       /* top to bottom */
+  align-items: stretch;         /* children fill the full width */
+  justify-content: flex-start;  /* start from the top, not the center */
+}
+
+/* HUD bar at the very top showing health, stamina, timer */
+#hud {
+  flex-shrink: 0;    /* don't let this shrink even if canvas wants more space */
+  height: 66px;      /* fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* player | center | cpu */
+  gap: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, rgba(0,0,0,.96), rgba(0,0,0,.4));
+  /* dark at top, fades to transparent at bottom */
+  z-index: 10; /* sit on top of the canvas */
+}
+
+/* each fighter's chunk of the HUD (name + bars + number) */
+.f-hud {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;       /* take up equal space on each side */
+  min-width: 0;  /* allows contents to shrink if screen is narrow */
+}
+
+/* flip the CPU side so everything mirrors — bar grows from right */
+#hud-cpu {
+  flex-direction: row-reverse; /* reverses the order of children */
+}
+
+/* fighter name text: PLAYER or CPU */
+.f-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 19px;
+  letter-spacing: 2px;
+  white-space: nowrap; /* prevents text from wrapping to a second line */
+}
+
+/* the grey track container that the health bar sits inside */
+.hp-outer {
+  flex: 1;          /* grow to fill available space */
+  height: 18px;
+  background: rgba(255,255,255,.1);
+  border: 2px solid rgba(255,255,255,.17);
+  border-radius: 4px;
+  overflow: hidden;  /* clips the inner bar so it never pokes outside */
+  min-width: 0;
+}
+
+/* the colored fill inside the health bar */
+/* JavaScript sets its width: bar.style.width = hp + '%' */
+.hp-inner {
+  height: 100%;
+  width: 100%;      /* starts at 100% = full health */
+  background: linear-gradient(90deg, #b03020, #e63946, #ff6b6b); /* red */
+  transition: width .22s ease; /* smoothly shrinks when you take damage */
+}
+
+/* CPU health bar is blue instead of red */
+#cpu-hp-bar {
+  background: linear-gradient(90deg, #1a4a7a, #457b9d, #7ec8e3);
+}
+
+/* thin green stamina bar below the health bar */
+.st-outer {
+  width: 100%;
+  height: 5px;
+  background: rgba(255,255,255,.07);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 3px;   /* small gap between health bar and stamina bar */
+}
+
+.st-inner {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #16a34a, #86efac); /* green */
+  transition: width .15s ease;
+  border-radius: 3px;
+}
+
+/* the HP number shown next to each bar */
+.hp-num {
+  font-size: 14px;
+  min-width: 28px;   /* minimum width so it doesn't jump as numbers change */
+  text-align: center;
+}
+
+/* center section of the HUD: round number and timer */
+.hud-mid {
+  text-align: center;
+  min-width: 72px;
+  flex-shrink: 0;    /* never shrink this section */
+}
+
+#round-txt {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px;
+  color: #f4a261;
+  letter-spacing: 2px;
+}
+
+#timer-txt {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  line-height: 1;
+  transition: color .3s; /* smoothly changes color when it becomes urgent */
+}
+
+/* .urgent is added by JavaScript when timer hits 10 seconds */
+#timer-txt.urgent {
+  color: #e63946;                          /* turns red */
+  animation: pulse .5s ease-in-out infinite; /* pulses using the same animation as VS */
+}
+
+
+/* ── LOBBY BUTTON ───────────────────────────────────────────────
+   Fixed to the top-right corner during gameplay.
+   position:fixed keeps it pinned no matter what the canvas does.
+   top:72px puts it just below the 66px HUD bar. */
+#lobby-btn {
+  position: fixed;   /* pinned to the window, not the page flow */
+  top: 72px;         /* just below the HUD */
+  right: 14px;       /* 14px from the right edge */
+  z-index: 20;       /* above the canvas so it's always clickable */
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #888;       /* grey */
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s; /* smooth color change on hover */
+}
+
+/* glows orange when you hover over it */
+#lobby-btn:hover {
+  color: #f4a261;
+  background: rgba(244,162,97,0.12);
+}
+
+
+/* ── GAME CANVAS ────────────────────────────────────────────────
+   The canvas is the drawing surface for the entire game.
+   All fighters, background, and particles are drawn here. */
+#game-canvas {
+  display: block;    /* removes a tiny gap browsers add under canvas elements */
+  flex: 1;           /* grow to fill ALL remaining space below the HUD */
+  width: 100%;
+  min-height: 0;     /* required for flex children to shrink properly */
+  cursor: crosshair; /* show a crosshair cursor over the game area */
+}
+
+
+/* ── MOVE LABEL ─────────────────────────────────────────────────
+   The attack name that flashes at the bottom like "KICK" or "HARD PUNCH" */
+#move-label {
+  position: fixed;              /* stays at the bottom of the screen */
+  bottom: 18px;
+  left: 50%;                    /* start at the horizontal center */
+  transform: translateX(-50%);  /* shift left by half its own width to truly center */
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: rgba(244,162,97,.9);
+  letter-spacing: 3px;
+  text-shadow: 0 0 14px #f4a261;
+  pointer-events: none; /* clicks pass right through it so it doesn't block the game */
+  z-index: 25;
+  transition: opacity .4s; /* fades out smoothly */
+  opacity: 0;               /* starts invisible — JavaScript makes it visible */
+}
+
+
+/* ── ROUND MESSAGE ──────────────────────────────────────────────
+   The big centered messages like FIGHT!, K.O.!, ROUND 2.
+   JavaScript removes and re-adds this element to restart the animation. */
+#round-msg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* without transform this would be offset — this centers it perfectly */
+  transform: translate(-50%, -50%);
+  z-index: 30;  /* on top of absolutely everything */
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(64px, 10vw, 110px);
+  color: #f4a261;
+  text-shadow: 0 0 30px #f4a261, 0 0 80px #c87941, 4px 4px 0 #2a1a00;
+  pointer-events: none;  /* don't block clicks */
+  white-space: nowrap;   /* keep the text on one line */
+  /* cubic-bezier makes it overshoot slightly and bounce back like a spring */
+  animation: popin .35s cubic-bezier(.34,1.56,.64,1) forwards;
+  /* forwards means: stay at the final state after the animation finishes */
+}
+
+/* K.O. messages are red instead of orange */
+#round-msg.ko {
+  color: #e63946;
+  text-shadow: 0 0 30px #e63946, 0 0 80px #aa0000, 4px 4px 0 #2a0000;
+}
+
+/* the pop-in spring animation */
+@keyframes popin {
+  from {
+    transform: translate(-50%, -50%) scale(.2); /* starts tiny */
+    opacity: 0;                                  /* starts invisible */
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);  /* ends full size */
+    opacity: 1;                                  /* ends fully visible */
+  }
+}
