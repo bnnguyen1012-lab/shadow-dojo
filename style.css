@@ -434,7 +434,7 @@ kbd {
     opacity: 0;                                  /* starts invisible */
   }
   to {
-    transform: translate(-50%, -50%) scale(1);  /* ends full size */
+    transform: translate(-50%, -50%) scale(2);  /* ends full size */
     opacity: 1;                                  /* ends fully visible */
   }
 }
