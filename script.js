@@ -18,7 +18,7 @@ const ctx = canvas.getContext('2d');
 // This function sizes the canvas to fill the screen minus the 66px HUD
 function resize() {
   canvas.width  = window.innerWidth;        // full window width
-  canvas.height = window.innerHeight - 66;  // full height minus the HUD bar
+  canvas.height = window.innerHeight - 67;  // full height minus the HUD bar
 }
 
 resize(); // run it immediately when the page loads
